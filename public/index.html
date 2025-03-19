@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Brief SEO</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">
+            Générateur de Brief SEO
+        </h1>
+        
+        <div class="space-y-8">
+            <!-- Formulaire de mot-clé -->
+            <form id="keywordForm" class="max-w-2xl mx-auto space-y-4 bg-white p-6 rounded-lg shadow">
+                <div class="space-y-2">
+                    <label for="keyword" class="block text-sm font-medium text-gray-700">
+                        Mot-clé principal
+                    </label>
+                    <input
+                        id="keyword"
+                        type="text"
+                        placeholder="Entrez votre mot-clé principal"
+                        required
+                        class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div class="space-y-2">
+                    <label for="customPrompt" class="block text-sm font-medium text-gray-700">
+                        Prompt personnalisé (optionnel)
+                    </label>
+                    <textarea
+                        id="customPrompt"
+                        placeholder="Personnalisez les instructions pour la génération du plan de contenu"
+                        class="w-full h-32 border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    ></textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    Générer le brief
+                </button>
+            </form>
+            
+            <!-- Message d'erreur -->
+            <div id="errorMessage" class="max-w-2xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg hidden">
+                <p class="text-red-600"></p>
+            </div>
+
+            <!-- Indicateur de chargement -->
+            <div id="loadingIndicator" class="flex justify-center items-center space-x-2 hidden">
+                <div class="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-gray-600">Génération du brief en cours...</span>
+            </div>
+
+            <!-- Résultat du brief -->
+            <div id="briefResult" class="hidden">
+                <!-- Le contenu sera généré dynamiquement par JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
