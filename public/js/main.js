@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Récupérer les valeurs du formulaire
         const keyword = ui.elements.keywordInput.value.trim();
+        const location = ui.elements.locationSelect.value;
         const customPrompt = ui.elements.customPromptInput.value.trim();
         
         // Valider les entrées
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Génération du brief pour le mot-clé: "${keyword}"`);
             
             // Générer le brief complet
-            const briefData = await api.generateBrief(keyword, customPrompt);
+            const briefData = await api.generateBrief(keyword, customPrompt, location);
             
             // Afficher le résultat
             ui.showBriefResult(briefData);

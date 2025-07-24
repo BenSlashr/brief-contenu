@@ -8,28 +8,29 @@ const api = {
     baseUrl: '/api',
     
     /**
-     * Récupère les données ThotSEO
+     * Récupère les données sémantiques
      * @param {string} keyword - Le mot-clé à analyser
-     * @returns {Promise<Object>} - Les données ThotSEO
+     * @param {string} location - La localisation (optionnel)
+     * @returns {Promise<Object>} - Les données sémantiques
      */
-    async fetchThotSeoData(keyword) {
+    async fetchSemanticData(keyword, location = 'France') {
         try {
-            const response = await fetch(`${this.baseUrl}/thot-seo`, {
+            const response = await fetch(`${this.baseUrl}/semantic-data`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ keyword }),
+                body: JSON.stringify({ keyword, location }),
             });
             
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || error.error || 'Erreur lors de la récupération des données ThotSEO');
+                throw new Error(error.message || error.error || 'Erreur lors de la récupération des données sémantiques');
             }
             
             return await response.json();
         } catch (error) {
-            console.error('Error fetching Thot SEO data:', error);
+            console.error('Error fetching semantic data:', error);
             throw error;
         }
     },
@@ -37,11 +38,11 @@ const api = {
     /**
      * Génère un plan de contenu
      * @param {string} keyword - Le mot-clé principal
-     * @param {Object} thotSeoData - Les données ThotSEO
+     * @param {Object} semanticData - Les données sémantiques
      * @param {string} customPrompt - Prompt personnalisé (optionnel)
      * @returns {Promise<Object>} - Le plan de contenu
      */
-    async generateContentPlan(keyword, thotSeoData, customPrompt = '') {
+    async generateContentPlan(keyword, semanticData, customPrompt = '') {
         try {
             const response = await fetch(`${this.baseUrl}/content-plan`, {
                 method: 'POST',
@@ -50,7 +51,7 @@ const api = {
                 },
                 body: JSON.stringify({ 
                     keyword,
-                    thotSeoData,
+                    semanticData,
                     customPrompt
                 }),
             });
@@ -70,10 +71,10 @@ const api = {
     /**
      * Génère une analyse de contenu
      * @param {string} keyword - Le mot-clé principal
-     * @param {Object} thotSeoData - Les données ThotSEO
+     * @param {Object} semanticData - Les données sémantiques
      * @returns {Promise<Object>} - L'analyse de contenu
      */
-    async generateContentAnalysis(keyword, thotSeoData) {
+    async generateContentAnalysis(keyword, semanticData) {
         try {
             const response = await fetch(`${this.baseUrl}/content-analysis`, {
                 method: 'POST',
@@ -82,7 +83,7 @@ const api = {
                 },
                 body: JSON.stringify({ 
                     keyword,
-                    thotSeoData
+                    semanticData
                 }),
             });
             
@@ -133,9 +134,10 @@ const api = {
      * Génère un brief complet
      * @param {string} keyword - Le mot-clé principal
      * @param {string} customPrompt - Prompt personnalisé (optionnel)
+     * @param {string} location - La localisation (optionnel)
      * @returns {Promise<Object>} - Le brief complet
      */
-    async generateBrief(keyword, customPrompt = '') {
+    async generateBrief(keyword, customPrompt = '', location = 'France') {
         try {
             const response = await fetch(`${this.baseUrl}/generate-brief`, {
                 method: 'POST',
@@ -144,7 +146,8 @@ const api = {
                 },
                 body: JSON.stringify({ 
                     keyword,
-                    customPrompt
+                    customPrompt,
+                    location
                 }),
             });
             
@@ -156,6 +159,33 @@ const api = {
             return await response.json();
         } catch (error) {
             console.error('Error generating brief:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Génère un PDF du brief
+     * @param {Object} briefData - Les données du brief
+     * @returns {Promise<Blob>} - Le blob du PDF
+     */
+    async generatePdf(briefData) {
+        try {
+            const response = await fetch(`${this.baseUrl}/generate-pdf`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ briefData }),
+            });
+            
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({ error: 'Erreur lors de la génération du PDF' }));
+                throw new Error(error.message || error.error || 'Erreur lors de la génération du PDF');
+            }
+            
+            return await response.blob();
+        } catch (error) {
+            console.error('Error generating PDF:', error);
             throw error;
         }
     }

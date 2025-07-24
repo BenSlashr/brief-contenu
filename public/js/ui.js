@@ -8,6 +8,7 @@ const ui = {
     elements: {
         keywordForm: null,
         keywordInput: null,
+        locationSelect: null,
         customPromptInput: null,
         errorMessage: null,
         loadingIndicator: null,
@@ -20,6 +21,7 @@ const ui = {
     init() {
         this.elements.keywordForm = document.getElementById('keywordForm');
         this.elements.keywordInput = document.getElementById('keyword');
+        this.elements.locationSelect = document.getElementById('location');
         this.elements.customPromptInput = document.getElementById('customPrompt');
         this.elements.errorMessage = document.getElementById('errorMessage');
         this.elements.loadingIndicator = document.getElementById('loadingIndicator');
@@ -83,14 +85,29 @@ const ui = {
         // Métadonnées SEO
         briefContent.appendChild(this.createSeoMetadataSection(briefData));
         
-        // Bouton d'export PDF
-        const exportButton = document.createElement('button');
-        exportButton.className = 'mt-8 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
-        exportButton.textContent = 'Exporter en PDF';
-        exportButton.addEventListener('click', () => {
+        // Boutons d'export PDF
+        const exportContainer = document.createElement('div');
+        exportContainer.className = 'mt-8 flex gap-4 justify-center';
+        
+        // Bouton export PDF avancé (serveur)
+        const exportPdfButton = document.createElement('button');
+        exportPdfButton.className = 'bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2';
+        exportPdfButton.innerHTML = '📄 Exporter en PDF';
+        exportPdfButton.addEventListener('click', () => {
+            this.exportToPdfAdvanced(briefData);
+        });
+        
+        // Bouton export impression (navigateur)
+        const printButton = document.createElement('button');
+        printButton.className = 'bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-2';
+        printButton.innerHTML = '🖨️ Impression';
+        printButton.addEventListener('click', () => {
             this.exportToPdf(briefData);
         });
-        briefContent.appendChild(exportButton);
+        
+        exportContainer.appendChild(exportPdfButton);
+        exportContainer.appendChild(printButton);
+        briefContent.appendChild(exportContainer);
         
         // Ajouter le contenu au résultat
         this.elements.briefResult.appendChild(briefContent);
@@ -112,7 +129,7 @@ const ui = {
         
         const info = document.createElement('p');
         info.className = 'text-gray-600';
-        info.textContent = `Nombre de mots recommandé : ${briefData.thotSeoData.mots_requis || 'Non spécifié'}`;
+        info.textContent = `Nombre de mots recommandé : ${briefData.semanticData.recommended_words || 'Non spécifié'}`;
         
         header.appendChild(title);
         header.appendChild(info);
@@ -136,7 +153,7 @@ const ui = {
         section.appendChild(title);
         
         // Mots-clés obligatoires
-        if (briefData.thotSeoData.KW_obligatoires && briefData.thotSeoData.KW_obligatoires.length > 0) {
+        if (briefData.semanticData.KW_obligatoires && briefData.semanticData.KW_obligatoires.length > 0) {
             const obligatoiresTitle = document.createElement('h4');
             obligatoiresTitle.className = 'text-lg font-semibold text-gray-700 mt-4 mb-2';
             obligatoiresTitle.textContent = 'Mots-clés obligatoires';
@@ -144,7 +161,7 @@ const ui = {
             const obligatoiresList = document.createElement('div');
             obligatoiresList.className = 'flex flex-wrap';
             
-            briefData.thotSeoData.KW_obligatoires.forEach(kw => {
+            briefData.semanticData.KW_obligatoires.forEach(kw => {
                 const tag = document.createElement('span');
                 tag.className = 'tag tag-blue';
                 tag.textContent = kw.mot;
@@ -156,7 +173,7 @@ const ui = {
         }
         
         // Mots-clés complémentaires
-        if (briefData.thotSeoData.KW_complementaires && briefData.thotSeoData.KW_complementaires.length > 0) {
+        if (briefData.semanticData.KW_complementaires && briefData.semanticData.KW_complementaires.length > 0) {
             const complementairesTitle = document.createElement('h4');
             complementairesTitle.className = 'text-lg font-semibold text-gray-700 mt-4 mb-2';
             complementairesTitle.textContent = 'Mots-clés complémentaires';
@@ -164,7 +181,7 @@ const ui = {
             const complementairesList = document.createElement('div');
             complementairesList.className = 'flex flex-wrap';
             
-            briefData.thotSeoData.KW_complementaires.forEach(kw => {
+            briefData.semanticData.KW_complementaires.forEach(kw => {
                 const tag = document.createElement('span');
                 tag.className = 'tag tag-green';
                 tag.textContent = kw.mot;
@@ -176,7 +193,7 @@ const ui = {
         }
         
         // Questions fréquentes
-        if (briefData.thotSeoData.questions && briefData.thotSeoData.questions.length > 0) {
+        if (briefData.semanticData.questions && briefData.semanticData.questions.length > 0) {
             const questionsTitle = document.createElement('h4');
             questionsTitle.className = 'text-lg font-semibold text-gray-700 mt-4 mb-2';
             questionsTitle.textContent = 'Questions fréquentes';
@@ -184,7 +201,7 @@ const ui = {
             const questionsList = document.createElement('ul');
             questionsList.className = 'list-disc pl-5 space-y-1 text-gray-700';
             
-            briefData.thotSeoData.questions.forEach(question => {
+            briefData.semanticData.questions.forEach(question => {
                 const item = document.createElement('li');
                 item.textContent = question;
                 questionsList.appendChild(item);
@@ -192,6 +209,33 @@ const ui = {
             
             section.appendChild(questionsTitle);
             section.appendChild(questionsList);
+        }
+        
+        // Informations sémantiques supplémentaires
+        if (briefData.semanticData.target_seo_score || briefData.semanticData.recommended_words) {
+            const semanticTitle = document.createElement('h4');
+            semanticTitle.className = 'text-lg font-semibold text-gray-700 mt-4 mb-2';
+            semanticTitle.textContent = 'Analyse sémantique';
+            
+            const semanticInfo = document.createElement('div');
+            semanticInfo.className = 'bg-blue-50 p-3 rounded';
+            
+            if (briefData.semanticData.target_seo_score) {
+                const scoreInfo = document.createElement('p');
+                scoreInfo.className = 'text-sm text-blue-700 mb-1';
+                scoreInfo.textContent = `Score SEO cible : ${briefData.semanticData.target_seo_score}`;
+                semanticInfo.appendChild(scoreInfo);
+            }
+            
+            if (briefData.semanticData.recommended_words) {
+                const wordsInfo = document.createElement('p');
+                wordsInfo.className = 'text-sm text-blue-700';
+                wordsInfo.textContent = `Nombre de mots recommandé : ${briefData.semanticData.recommended_words}`;
+                semanticInfo.appendChild(wordsInfo);
+            }
+            
+            section.appendChild(semanticTitle);
+            section.appendChild(semanticInfo);
         }
         
         return section;
@@ -624,5 +668,88 @@ const ui = {
                 // printWindow.close();
             }, 500);
         };
+    },
+
+    /**
+     * Exporte le brief en PDF via l'API serveur (version avancée)
+     * @param {Object} briefData - Les données du brief
+     */
+    async exportToPdfAdvanced(briefData) {
+        try {
+            // Afficher un indicateur de chargement
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'pdf-loading';
+            loadingIndicator.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loadingIndicator.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <p class="text-gray-700">Génération du PDF en cours...</p>
+                    <p class="text-sm text-gray-500 mt-2">Cela peut prendre quelques secondes</p>
+                </div>
+            `;
+            document.body.appendChild(loadingIndicator);
+            
+            // Générer le PDF via l'API
+            const pdfBlob = await api.generatePdf(briefData);
+            
+            // Créer un lien de téléchargement
+            const url = window.URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `brief-seo-${briefData.keyword.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+            
+            // Déclencher le téléchargement
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Nettoyer l'URL
+            window.URL.revokeObjectURL(url);
+            
+            // Afficher un message de succès
+            this.showSuccessMessage('PDF généré et téléchargé avec succès !');
+            
+        } catch (error) {
+            console.error('Erreur lors de l\'export PDF:', error);
+            this.showError('Erreur lors de la génération du PDF: ' + error.message);
+        } finally {
+            // Supprimer l'indicateur de chargement
+            const loadingIndicator = document.getElementById('pdf-loading');
+            if (loadingIndicator) {
+                document.body.removeChild(loadingIndicator);
+            }
+        }
+    },
+
+    /**
+     * Affiche un message de succès temporaire
+     * @param {string} message - Le message à afficher
+     */
+    showSuccessMessage(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-transform duration-300';
+        successDiv.innerHTML = `
+            <div class="flex items-center gap-2">
+                <span>✅</span>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(successDiv);
+        
+        // Animation d'entrée
+        setTimeout(() => {
+            successDiv.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Supprimer après 3 secondes
+        setTimeout(() => {
+            successDiv.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (document.body.contains(successDiv)) {
+                    document.body.removeChild(successDiv);
+                }
+            }, 300);
+        }, 3000);
     }
 };

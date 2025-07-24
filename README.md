@@ -5,18 +5,21 @@ Une application web pour générer des briefs SEO détaillés à partir d'un mot
 ## Fonctionnalités
 
 - Génération de briefs SEO complets à partir d'un mot-clé
-- Analyse des mots-clés via l'API ThotSEO
-- Génération de contenu avec OpenAI
+- Analyse sémantique avancée via l'API SlashR
+- Analyse de la structure des titres du top 10 SERP via ValueSERP
+- Génération de contenu avec OpenAI intégrant l'analyse concurrentielle
 - Interface utilisateur intuitive et responsive
 - Export des briefs en PDF
 - Objectif de contenu généré automatiquement
 - Structure hiérarchique claire avec balises H2 et H3
+- Score SEO cible et recommandations de longueur
 
 ## Prérequis
 
 - Node.js 18.0.0 ou supérieur
-- Clé API ThotSEO
 - Clé API OpenAI
+- Accès à l'API sémantique SlashR (https://outils.agence-slashr.fr/semantique/api/v1)
+- Clé API ValueSERP (https://www.valueserp.com/)
 
 ## Installation
 
@@ -39,8 +42,10 @@ cp .env.example .env
 4. Configurer les variables d'environnement dans le fichier `.env`
 ```
 PORT=3000
-THOT_API_URL=https://api.thot-seo.fr/commande-api
-THOT_API_KEY=votre_cle_api_thot_seo
+SEMANTIC_API_URL=https://outils.agence-slashr.fr/semantique/api/v1
+SEMANTIC_LOCATION=France
+SEMANTIC_TIMEOUT=30000
+VALUESERP_API_KEY=votre_cle_api_valueserp
 OPENAI_API_KEY=votre_cle_api_openai
 ```
 
