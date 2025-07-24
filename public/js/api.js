@@ -5,7 +5,7 @@ const api = {
     /**
      * URL de base de l'API
      */
-    baseUrl: '/api',
+    baseUrl: (window.location.pathname.includes('/brief-contenu/') ? '/brief-contenu' : '') + '/api',
     
     /**
      * Récupère les données sémantiques

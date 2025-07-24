@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  brief-contenu:
+    build: .
+    container_name: brief-contenu-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - BASE_PATH=/brief-contenu
+      - PORT=3000
+      # Variables d'API à définir
+      - SEMANTIC_API_URL=https://outils.agence-slashr.fr/semantique/api/v1
+      - SEMANTIC_LOCATION=France
+      - SEMANTIC_TIMEOUT=30000
+      - VALUESERP_API_KEY=${VALUESERP_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      # Optionnel: pour persister les logs
+      - ./logs:/app/logs
+    networks:
+      - brief-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/brief-contenu/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  brief-network:
+    driver: bridge 

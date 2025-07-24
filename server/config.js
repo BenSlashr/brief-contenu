@@ -2,6 +2,7 @@ require('dotenv').config();
 
 module.exports = {
   port: process.env.PORT || 3000,
+  basePath: process.env.BASE_PATH || '/brief-contenu', // Chemin de base pour le déploiement
   semantic: {
     apiBaseUrl: process.env.SEMANTIC_API_URL || 'https://outils.agence-slashr.fr/semantique/api/v1',
     defaultLocation: process.env.SEMANTIC_LOCATION || 'France',
